@@ -46,3 +46,7 @@ class Clock
     minutes = @minute % 60
   end
 end
+
+
+# Interesting points, the one thing which makes this solution work is the fact that
+# -1 % 24 => 23 ?? How does this work?? Mathematicians please explain
