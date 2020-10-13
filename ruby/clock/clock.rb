@@ -1,83 +1,48 @@
+#  Sample
+#  https://exercism.io/tracks/ruby/exercises/clock/solutions/decb04ba0500485a9bc63ef998c21dd2
 class Clock
+  HOURS_IN_DAY = 24
+
   attr_reader :hour, :minute
 
-  def initialize(hour: nil, minute: nil)
+  def initialize(hour: 0, minute: 0)
     @hour   = hour
     @minute = minute
-    handle_rolling_minutes!
-    handle_negative_hours!
+    convert_hours_to_minutes
   end
 
   def to_s
-    "#{readable_hour}:#{readable_minute}"
+    "#{format('%02d', hours)}:#{format('%02d', minutes)}"
+  end
+
+  # (clock1 + Clock.new(minute: 3)
+  # returns a new clock
+  def +(clock)
+    clock = Clock.new(minute: @minute + clock.minute)
+    clock
+  end
+
+  def -(clock)
+    clock = Clock.new(minute: @minute - clock.minute)
+    clock
+  end
+
+  def ==(other_clock)
+    self.to_s == other_clock.to_s
   end
 
   private
 
-  def handle_rolling_minutes!
-    if !@minute.nil? && @minute >= 60
-      new_minute  = @minute
-      total_hours = 0
-
-      while new_minute >= 60
-        total_hours += 1
-        new_minute  -= 60
-      end
-
-      # @hour could be nil
-      if @hour.nil?
-        @hour = total_hours
-      else
-        @hour  += total_hours
-      end
-      @minute = new_minute
-    end
+  def convert_hours_to_minutes
+    minutes = @hour * 60
+    @minute += minutes
   end
 
-  def handle_negative_hours!
-    if @hour.negative?
-      @hour = 24 + @hour
-    end
+  def hours
+    hours = (@minute / 60) % HOURS_IN_DAY
   end
 
-  # Presenter layer
-  def hours_rolling_over?
-    hour >= 24
-  end
-
-  def rolling_hours
-    new_hour = hour
-    remaining = 0
-
-    while new_hour >= 24 do
-      new_hour  = new_hour - 24
-      remaining = new_hour
-    end
-
-    if remaining.to_s.size <= 1
-      "0#{remaining}"
-    else
-      remaining.to_s
-    end
-  end
-
-  def readable_hour
-    if hour.to_s.size <= 1
-      "0#{hour}"
-    elsif hours_rolling_over?
-      rolling_hours
-    else
-      hour.to_s
-    end
-  end
-
-  def readable_minute
-    if minute.nil?
-      "00"
-    elsif minute.to_s.size <= 1
-      "0#{minute}"
-    else
-      "#{minute}"
-    end
+  def minutes
+    minutes = @minute % 60
   end
 end
